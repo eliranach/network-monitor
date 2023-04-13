@@ -15,8 +15,7 @@ using namespace boost::beast::websocket;
 
 
 
-
-void Log(const std::string& where, boost::system::error_code ec)
+void Log(const std::string& where, boost::system::error_code& ec)
 {
     std::cerr << "[" << std::setw(10) << where << std::setw(5) << "] "
               << (ec ? "Error: " : "OK")
@@ -24,61 +23,119 @@ void Log(const std::string& where, boost::system::error_code ec)
               << std::endl;
 }
 
+
+void OnReceive(boost::beast::flat_buffer& rBuffer, boost::system::error_code& ec){
+    if (ec) {
+        Log("OnReceive", ec);
+        return;
+    }
+        std::cout << "ECHO: "
+              << boost::beast::make_printable(rBuffer.data())
+              << std::endl;
+
+}
+
+
+void OnSend( websocket::stream<boost::beast::tcp_stream>& ws,
+    boost::beast::flat_buffer& rBuffer, boost::system::error_code& ec){
+
+        int i {0};
+        if (ec) {
+        Log("OnSend", ec);
+        return;
+    }
+    // Read the echoed message back.
+    ws.async_read(rBuffer,
+        [&rBuffer](auto ec, auto nBytesRead) {
+            OnReceive(rBuffer, ec);
+        }
+    );
+     
+}
+
+
+void OnHandshake(    // --> Start of shared data  
+    websocket::stream<boost::beast::tcp_stream>& ws,
+    const boost::asio::const_buffer& wBuffer,
+    boost::beast::flat_buffer& rBuffer,
+    // <-- End of shared data
+    boost::system::error_code& ec){
+    if (ec){
+        Log("OnHandshake", ec);
+        return;
+    }
+     ws.text(true);
+     ws.async_write(wBuffer, [&rBuffer, &ws] (auto ec, auto nBytesWritten){
+            OnSend(ws, rBuffer, ec);
+     });
+    
+
+}
+
+void OnConnect(boost::system::error_code& ec,  
+               websocket::stream<boost::beast::tcp_stream>& ws,
+                const std::string& host,  
+                 const std::string& port,
+                 const std::string& message,
+                const boost::asio::const_buffer& wBuffer,
+                boost::beast::flat_buffer& rBuffer
+    ){
+    if (ec){
+        Log("OnConnect", ec);
+        return;
+    }
+    
+    const std::string endpoint {"/echo"};
+
+    ws.async_handshake(host, endpoint, [&ws, &wBuffer, &rBuffer](auto ec){
+        OnHandshake(ws, wBuffer, rBuffer, ec);
+    });
+}
+
+
+
+void OnResolve(boost::system::error_code& ec,  
+                tcp::resolver::iterator resolverIt,
+                 const std::string& host,  
+                 const std::string& port,
+                 const std::string& message,
+                 websocket::stream<boost::beast::tcp_stream>& ws,
+                const boost::asio::const_buffer& wBuffer,
+                boost::beast::flat_buffer& rBuffer
+              ){
+    if (ec){
+        Log("OnResolve", ec);
+        return;
+    }
+    ws.next_layer().async_connect(*resolverIt,
+        [&host, &port, &message, &ws,&wBuffer, &rBuffer](auto ec) {
+            OnConnect(ec, ws, host,port, message, wBuffer, rBuffer);
+        }
+    );
+}
+
+
+
+
 int main()
 {
 
-    const std::string host = {"ltnm.learncppthroughprojects.com"};
+    const std::string host {"ltnm.learncppthroughprojects.com"};
     const std::string port {"80"};
     const std::string message {"hello learncppthroughprojects :)"};
 
     net::io_context ioc {};
 
     tcp::resolver resolver {ioc};
+    websocket::stream<boost::beast::tcp_stream> ws {ioc};
+    boost::asio::const_buffer wBuffer {message.c_str(), message.size()};
+    boost::beast::flat_buffer rBuffer {};
 
-    boost::system::error_code ec {};
-    auto resolverIt {resolver.resolve(host, port, ec)};
-    if (ec) {
-        Log("resolver.resolve", ec);
-        return -1;
-    }
-    tcp::socket socket {ioc};
+    resolver.async_resolve(host, port, [&host, &port, &message, &ws, &wBuffer, &rBuffer](auto ec, auto resolverIt){
+        OnResolve(ec,resolverIt, host, port, message, ws, wBuffer, rBuffer);
+    });
 
-    socket.connect(*resolverIt, ec);
-    if (ec) {
-        Log("socket.connect", ec);
-        return -2;
-    }
-    websocket::stream<boost::beast::tcp_stream> ws{std::move(socket)};
+    ioc.run();
 
-    ws.handshake(host, "/echo",ec);
-    if (ec) {
-        Log("ws.handshake", ec);
-        return -3;
-    }
-
-    ws.text(true);
-    
-    
-    boost::asio::const_buffer wbuffer {message.c_str(), message.size()};
-    ws.write(wbuffer);
-    if (ec) {
-        Log("ws.write", ec);
-        return -4;
-    }
-
-    beast::flat_buffer rbuffer {};
-
-    ws.read(rbuffer, ec);
-    if (ec) {
-        Log("ws.read", ec);
-        return 51;
-    }
-
-    // Print the echoed message.
-    std::cout << "ECHO: "
-          << boost::beast::make_printable(rbuffer.data())
-          << std::endl;
-
-    Log("returning", ec);
     return 0;
 }

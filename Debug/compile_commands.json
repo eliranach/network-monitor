@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/eliran_nachmani/Desktop/network-monitor/Debug",
+  "command": "\"D:\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx86\\x64\\cl.exe\"  /nologo /TP -DBOOST_ALL_NO_LIB -DBOOST_STACKTRACE_USE_NOOP -DBOOST_STACKTRACE_USE_WINDBG -DBOOST_STACKTRACE_USE_WINDBG_CACHED -external:IC:\\.conan\\44ff27\\1\\include -external:IC:\\Users\\eliran_nachmani\\.conan\\data\\bzip2\\1.0.8\\_\\_\\package\\589a23dff5fdb23a7fb851223eb766480ead0a9a\\include -external:IC:\\Users\\eliran_nachmani\\.conan\\data\\zlib\\1.2.13\\_\\_\\package\\d057732059ea44a47760900cb5e4855d2bea8714\\include -external:W0 /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd /FoCMakeFiles\\network-monitor.dir\\src\\main.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\eliran_nachmani\\Desktop\\network-monitor\\src\\main.cpp",
+  "file": "C:\\Users\\eliran_nachmani\\Desktop\\network-monitor\\src\\main.cpp",
+  "output": "CMakeFiles\\network-monitor.dir\\src\\main.cpp.obj"
+}
+]

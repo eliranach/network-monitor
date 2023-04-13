@@ -1,0 +1,3 @@
+C:/Users/eliran_nachmani/Desktop/network-monitor/Debug/CMakeFiles/network-monitor.dir
+C:/Users/eliran_nachmani/Desktop/network-monitor/Debug/CMakeFiles/edit_cache.dir
+C:/Users/eliran_nachmani/Desktop/network-monitor/Debug/CMakeFiles/rebuild_cache.dir
