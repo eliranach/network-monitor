@@ -6,7 +6,6 @@ set (CMAKE_BUILD_TYPE "Debug" CACHE
 
 project(network-monitor)
 
-
 # Add the local CMake modules folder to the CMake search path.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -25,33 +24,46 @@ if(WIN32)
     get_win_ver(WINDOWS_VERSION)
 endif()
 
-
-
-set(HEADERS
-"${CMAKE_CURRENT_SOURCE_DIR}/src/WebsocketClient.h"
-)
-
-set(SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
+set(LIB_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/WebsocketClient.cpp"
 )
+add_library(network-monitor STATIC ${LIB_SOURCES})
 
-add_executable(network-monitor ${SOURCES})
 target_compile_features(network-monitor
-    PRIVATE
+    PUBLIC
         cxx_std_14
 )
+
 target_compile_definitions(network-monitor
     PRIVATE
         $<$<PLATFORM_ID:Windows>:_WIN32_WINNT=${WINDOWS_VERSION}>
 )
 target_include_directories(network-monitor
-    PRIVATE
-        src
+    PUBLIC
+        inc
 )
 target_link_libraries(network-monitor
-    PRIVATE
+    PUBLIC
         Boost::Boost
 )
 
 
+
+# Tests
+set(TESTS_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/WebsocketClient.cpp"
+)
+add_executable(network-monitor-tests ${TESTS_SOURCES})
+target_compile_features(network-monitor-tests
+    PRIVATE
+        cxx_std_14
+)
+target_compile_definitions(network-monitor-tests
+    PRIVATE
+        $<$<PLATFORM_ID:Windows>:_WIN32_WINNT=${WINDOWS_VERSION}>
+)
+target_link_libraries(network-monitor-tests
+    PRIVATE
+        network-monitor
+        Boost::Boost
+)
