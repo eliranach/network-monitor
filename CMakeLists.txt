@@ -16,6 +16,7 @@ if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/conaninfo.txt)
     list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 find_package(Boost 1.74 REQUIRED COMPONENTS system)
+find_package(OpenSSL REQUIRED)
 
 # Called before any other target is defined.
 enable_testing()
@@ -48,6 +49,7 @@ target_include_directories(network-monitor
 target_link_libraries(network-monitor
     PUBLIC
         Boost::Boost
+        OpenSSL::OpenSSL
 )
 
 
@@ -70,6 +72,7 @@ target_link_libraries(network-monitor-tests
     PRIVATE
         network-monitor
         Boost::Boost
+        OpenSSL::OpenSSL
 )
 
 add_test(

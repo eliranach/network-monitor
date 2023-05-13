@@ -1,4 +1,5 @@
 #include <network-monitor/WebsocketClient.h>
+#include <openssl/ssl.h>
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/system/error_code.hpp>
