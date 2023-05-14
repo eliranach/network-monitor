@@ -4,6 +4,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_BUILD_TYPE "Debug" CACHE
       STRING "Choose the type of build.")
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+
 project(network-monitor)
 
 # Add the local CMake modules folder to the CMake search path.
