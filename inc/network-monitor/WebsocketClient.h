@@ -1,5 +1,6 @@
 #ifndef WEBSOCKET_CLIENT_H
 #define WEBSOCKET_CLIENT_H
+
 #include <boost/beast/ssl.hpp>
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
