@@ -16,4 +16,12 @@ bool DownloadFile(
     const std::filesystem::path& caCertFile = {}
 );
 
+
+
+
+bool SaveTextInFile(
+    const std::string& content,
+    const std::filesystem::path& destination
+);
+
 } // namespace NetworkMonitor

@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(file_downloader)
     // We cannot check the whole file content as it changes over time, but we
     // can at least check some expected file properties.
     {
-        const std::string expectedString {"\"stations\": ["};
+        const std::string expectedString {"\"lines\": ["};
         std::ifstream file {destination};
         std::string line {};
         bool foundExpectedString {false};

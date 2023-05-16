@@ -20,6 +20,7 @@ endif()
 find_package(Boost 1.74 REQUIRED COMPONENTS system)
 find_package(cpr REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(jsoncpp REQUIRED)
 
 # Called before any other target is defined.
 enable_testing()
@@ -54,7 +55,9 @@ target_link_libraries(network-monitor
     PUBLIC
         Boost::Boost
         OpenSSL::OpenSSL
+    PRIVATE
         cpr::cpr
+        jsoncpp::jsoncpp
 )
 
 
@@ -80,7 +83,7 @@ target_link_libraries(network-monitor-tests
         network-monitor
         Boost::Boost
         OpenSSL::OpenSSL
-        cpr::cpr
+        
 )
 
 add_test(
