@@ -2,12 +2,12 @@
 
 #include <boost/asio.hpp>
 #include <boost/test/unit_test.hpp>
-
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <json/json.h>
 
-using NetworkMonitor::DownloadFile;
+using namespace NetworkMonitor;
 
 BOOST_AUTO_TEST_SUITE(network_monitor);
 
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(file_downloader)
     // We cannot check the whole file content as it changes over time, but we
     // can at least check some expected file properties.
     {
-        const std::string expectedString {"\"lines\": ["};
+        const std::string expectedString {"\"stations\": ["};
         std::ifstream file {destination};
         std::string line {};
         bool foundExpectedString {false};
@@ -45,5 +45,18 @@ BOOST_AUTO_TEST_CASE(file_downloader)
     // Clean up.
     std::filesystem::remove(destination);
 }
+
+BOOST_AUTO_TEST_CASE(parse_file)
+{
+    // Parse the file.
+    const std::filesystem::path sourceFile {TESTS_NETWORK_LAYOUT_JSON};
+    auto parsed = ParseJsonFile(sourceFile);
+    BOOST_CHECK(parsed.isMember("lines"));
+    BOOST_CHECK(parsed["lines"] > 0);
+    BOOST_CHECK(parsed.isMember("stations"));
+    BOOST_CHECK(parsed["stations"] > 0);
+    BOOST_CHECK(parsed.isMember("travel_times"));
+    BOOST_CHECK(parsed["travel_times"] > 0);
+ }
 
 BOOST_AUTO_TEST_SUITE_END();

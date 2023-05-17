@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <string>
+#include <json/json.h>
 
 namespace NetworkMonitor {
 
@@ -18,10 +19,24 @@ bool DownloadFile(
 
 
 
-
+/*! \brief Save string content into a file.
+ *
+ *  \param content the string to be saved
+ *  \param destination The full path and filename of the output file. 
+ */
 bool SaveTextInFile(
     const std::string& content,
     const std::filesystem::path& destination
 );
+
+
+/*! \brief Parse a local file into a JSON object.
+ *
+ *  \param source The path to the JSON file to load and parse.
+ */
+Json::Value ParseJsonFile(
+    const std::filesystem::path& source
+);
+
 
 } // namespace NetworkMonitor

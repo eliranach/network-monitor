@@ -55,9 +55,9 @@ target_link_libraries(network-monitor
     PUBLIC
         Boost::Boost
         OpenSSL::OpenSSL
+        jsoncpp::jsoncpp
     PRIVATE
         cpr::cpr
-        jsoncpp::jsoncpp
 )
 
 
@@ -76,6 +76,7 @@ target_compile_features(network-monitor-tests
 target_compile_definitions(network-monitor-tests
     PRIVATE
         TESTS_CACERT_PEM="${CMAKE_CURRENT_SOURCE_DIR}/tests/cacert.pem"
+        TESTS_NETWORK_LAYOUT_JSON="${CMAKE_CURRENT_SOURCE_DIR}/tests/network-layout.json"
         $<$<PLATFORM_ID:Windows>:_WIN32_WINNT=${WINDOWS_VERSION}>
 )
 target_link_libraries(network-monitor-tests
@@ -83,6 +84,7 @@ target_link_libraries(network-monitor-tests
         network-monitor
         Boost::Boost
         OpenSSL::OpenSSL
+        jsoncpp::jsoncpp
         
 )
 

@@ -2,6 +2,7 @@
 #include <string>
 #include <network-monitor/file-downloader.h>
 #include <cpr/cpr.h>
+#include <json/json.h>
 
 
 bool NetworkMonitor::SaveTextInFile(
@@ -27,5 +28,24 @@ bool NetworkMonitor::DownloadFile(
     ans = ans && r.status_code == 200 && r.header["content-type"] == "application/json";
     ans = ans && SaveTextInFile(r.text, destination);
     return ans;
+}
+
+
+Json::Value NetworkMonitor::ParseJsonFile(
+    const std::filesystem::path& source
+){
+    Json::Value parsed {};
+    std::ifstream ifs {};
+    if(!std::filesystem::exists(source)){
+        return parsed;
+    }
+    try {
+        std::ifstream ifs(source);
+        Json::Reader reader;
+        reader.parse(ifs, parsed);
+    }catch(...){
+
+    }
+    return parsed;
 }
 
