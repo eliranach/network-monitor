@@ -1,9 +1,12 @@
-#ifndef TRANSPORT_NETWORK_H
-#define TRANSPORT_NETWORK_H
+#ifndef NETWORK_MONITOR_TRANSPORT_NETWORK_H
+#define NETWORK_MONITOR_TRANSPORT_NETWORK_H
 
+#include <json/json.h>
+
+#include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
-
 
 namespace NetworkMonitor {
 
@@ -129,6 +132,23 @@ public:
         TransportNetwork&& moved
     );
 
+    /*! \brief Populate the network from a JSON object.
+     *
+     *  \param src Ownership of the source JSON object is moved to this method.
+     *
+     *  \returns false if stations and lines where parsed successfully, but not
+     *           the travel times.
+     *
+     *  \throws std::runtime_error This method throws if the JSON items were
+     *                             parsed correctly but there was an issue
+     *                             adding new stations or lines to the network.
+     *  \throws nlohmann::json::exception If there was a problem parsing the
+     *                                    JSON object.
+     */
+    bool FromJson(
+        Json::Value&& src
+    );
+
     /*! \brief Add a station to the network.
      *
      *  \returns false if there was an error while adding the station to the
@@ -241,10 +261,81 @@ public:
         const Id& stationB
     ) const;
 
-    // ...
+private:
+    // Forward-declare all internal structs.
+    struct GraphNode;
+    struct GraphEdge;
+    struct RouteInternal;
+    struct LineInternal;
+
+    // Graph node
+    // We use this as the internal station representation.
+    struct GraphNode {
+        Id id {};
+        std::string name {};
+        long long int passengerCount {0};
+        std::vector<std::shared_ptr<GraphEdge>> edges {};
+
+        // Find the edge for a specific line route.
+        std::vector<
+            std::shared_ptr<GraphEdge>
+        >::const_iterator FindEdgeForRoute(
+            const std::shared_ptr<RouteInternal>& route
+        ) const;
+    };
+
+    // Graph edge
+    // We keep one edge for each route going through a node, even if multiple
+    // routes go through the same node.
+    struct GraphEdge {
+        std::shared_ptr<RouteInternal> route {nullptr};
+        std::shared_ptr<GraphNode> nextStop {nullptr};
+        unsigned int travelTime {0};
+    };
+
+    // Internal route representation
+    struct RouteInternal {
+        Id id {};
+        std::shared_ptr<LineInternal> line {nullptr};
+        std::vector<std::shared_ptr<GraphNode>> stops {};
+    };
+
+    // Internal line representation
+    // We map line routes by their ID.
+    struct LineInternal {
+        Id id {};
+        std::string name {};
+        std::unordered_map<Id, std::shared_ptr<RouteInternal>> routes {};
+    };
+
+    // Map station and lines by ID. We do not map line routes here, as they
+    // are mapped within each line representation.
+    std::unordered_map<Id, std::shared_ptr<GraphNode>> stations_ {};
+    std::unordered_map<Id, std::shared_ptr<LineInternal>> lines_ {};
+
+    // Get station by ID.
+    std::shared_ptr<GraphNode> GetStation(
+        const Id& stationId
+    ) const;
+
+    // Get line by ID.
+    std::shared_ptr<LineInternal> GetLine(
+        const Id& lineId
+    ) const;
+
+    // Get route by ID.
+    std::shared_ptr<RouteInternal> GetRoute(
+        const Id& lineId,
+        const Id& routeId
+    ) const;
+
+    // This function adds a route to the internal line representation.
+    bool AddRouteToLine(
+        const Route& route,
+        const std::shared_ptr<LineInternal>& lineInternal
+    );
 };
 
 } // namespace NetworkMonitor
 
-
-#endif // TRANSPORT_NETWORK_H
+#endif // NETWORK_MONITOR_TRANSPORT_NETWORK_H
