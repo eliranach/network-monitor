@@ -1,3 +1,7 @@
+
+#ifndef WEBSOCKET_CLIENT_FILE_DOWNLOADER_H
+#define WEBSOCKET_CLIENT_FILE_DOWNLOADER_H
+
 #include <filesystem>
 #include <string>
 #include <json/json.h>
@@ -40,3 +44,5 @@ Json::Value ParseJsonFile(
 
 
 } // namespace NetworkMonitor
+
+#endif // WEBSOCKET_CLIENT_FILE_DOWNLOADER_H
